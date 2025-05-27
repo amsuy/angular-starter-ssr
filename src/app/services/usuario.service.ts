@@ -1,0 +1,143 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+
+@Injectable({ providedIn: 'root' })
+export class UsuarioService {
+  private rolesUrl = 'http://localhost:9494/api';
+
+  constructor(private http: HttpClient) {}
+
+  // 🔐 Login
+  login(datos: { username: string; password: string }): Observable<any> {
+    return this.http.post(`${this.rolesUrl}/login`, datos);
+  }
+
+  // ✅ Guardar paciente como recepcionista
+  guardarPacienteRecepcionista(paciente: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(`${this.rolesUrl}/recepcionista/paciente`, paciente, { headers });
+  }
+
+  // ✅ Guardar paciente como administrador
+  guardarPacienteAdministrador(paciente: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(`${this.rolesUrl}/admin/paciente`, paciente, { headers });
+  }
+
+  // ✅ Obtener todos los pacientes (doctor)
+  obtenerPacientes(): Observable<any> {
+    return this.http.get(`${this.rolesUrl}/doctor/pacientes`);
+  }
+
+  // 📄 Consultar pacientes
+consultarPacientes(): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/pacientes`);
+}
+
+// 📄 Crear nueva cita
+crearCitaRecepcionista(cita: any): Observable<any> {
+  const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  return this.http.post(`${this.rolesUrl}/recepcionista/cita`, cita, { headers });
+}
+
+// 🔎 Buscar citas por NIT y estado
+buscarCitasPorNitYEstado(nit: number, estado: string): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/citas/nit-estado/${nit}/${estado}`);
+}
+
+
+// 📄 Consultar citas por estado (según endpoints definidos en el backend)
+consultarCitasPorEstado(estado: string): Observable<any> {
+  const endpoint = estado.toUpperCase(); // PROGRAMADAS, REALIZADAS, CANCELADAS
+
+  let url = '';
+
+  if (endpoint === 'PROGRAMADAS') {
+    url = `${this.rolesUrl}/recepcionista/citas/programadas`;
+  } else if (endpoint === 'REALIZADAS') {
+    url = `${this.rolesUrl}/recepcionista/citas/realizadas`;
+  } else if (endpoint === 'CANCELADAS') {
+    url = `${this.rolesUrl}/recepcionista/citas/canceladas`;
+  } else {
+    throw new Error('Estado de cita no válido');
+  }
+
+  return this.http.get(url);
+}
+
+// ✅ Cambiar estado a REALIZADA
+marcarComoRealizada(id: number, datos: any): Observable<any> {
+  const headers = { 'Content-Type': 'application/json' };
+  return this.http.put(`http://localhost:9292/api/citas/finalizar/${id}`, datos, { headers });
+}
+
+// ✅ Cambiar estado a CANCELADA (ahora también recibe fechaFin)
+marcarComoCancelada(id: number, datos: any): Observable<any> {
+  const headers = { 'Content-Type': 'application/json' };
+  return this.http.put(`http://localhost:9292/api/citas/cancelar/${id}`, datos, { headers });
+}
+
+
+
+// ✅ Obtener doctores activos (vía microservicio roles)
+obtenerDoctores(): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/doctores`);
+}
+
+// 🔎 Buscar paciente por nombre
+buscarPacientePorNombre(nombre: string): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/pacientes/nombre/${nombre}`);
+}
+
+// 🔎 Buscar paciente por NIT
+buscarPacientePorNit(nit: number): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/pacientes/nit/${nit}`);
+}
+
+// 🔎 Buscar paciente por CUI
+buscarPacientePorCui(cui: number): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/pacientes/cui/${cui}`);
+}
+
+// 🔎 Buscar doctor por nombre
+buscarDoctorPorNombre(nombre: string): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/doctores/nombre/${nombre}`);
+}
+
+// 🔎 Buscar doctor por colegiado
+buscarDoctorPorColegiado(colegiado: string): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/doctores/colegiado/${colegiado}`);
+}
+
+// 🔎 Buscar doctor por especialidad
+buscarDoctorPorEspecialidad(especialidad: string): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/doctores/especialidad/${especialidad}`);
+}
+
+buscarPacientePorId(id: number): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/pacientes/id/${id}`);
+}
+
+buscarPacientePorFecha(fecha: string): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/pacientes/fecha/${fecha}`);
+}
+
+buscarDoctorPorId(id: number): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/doctores/id/${id}`);
+}
+
+buscarDoctorPorFecha(fecha: string): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/doctores/fecha/${fecha}`);
+}
+
+buscarCitasPorPacienteYEstado(id: number, estado: string): Observable<any> {
+  return this.http.get(`${this.rolesUrl}/recepcionista/citas/paciente-estado/${id}/${estado}`);
+}
+
+
+
+
+
+
+}

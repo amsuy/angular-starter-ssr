@@ -1,0 +1,1005 @@
+<div class="admin-dashboard">
+  <!-- Sidebar fijo -->
+  <div class="sidebar-admin">
+    <img src="assets/img/logo.png" alt="Hospital Logo" class="logo" />
+
+    <button (click)="cambiarVista('paciente')">👨‍⚕️ Módulo Pacientes</button>
+    <button (click)="cambiarVista('doctor')">🩺 Módulo Doctores</button>
+    <button (click)="cambiarVista('citas')">📅 Módulo Citas</button>
+    <button (click)="cambiarVista('login')">🔐 Módulo Login</button>
+    <button (click)="limpiarPantalla()">🧹 Refrescar Pantalla</button>
+    <button (click)="cerrarSesion()">⬅ Cerrar Sesión</button>
+  </div>
+
+  <!-- Contenido dinámico -->
+  <div class="contenido-admin">
+    <ng-container [ngSwitch]="vista">
+
+      <!-- Módulo Paciente -->
+
+      <div *ngSwitchCase="'paciente'">
+        <div class="barra-citas-horizontal">
+          <button class="btn-paciente-lateral" (click)="seccionPacientes = 'registrar'">📄 Registrar Pacientes</button>
+          <button class="btn-paciente-lateral" (click)="setSeccionPacientes('consultar')">🔍 Consultar
+            Pacientes</button>
+          <button class="btn-paciente-lateral" (click)="seccionPacientes = 'eliminar'">❌ Eliminar Paciente</button>
+          <button class="btn-paciente-lateral" (click)="seccionPacientes = 'restaurar'">♻️ Restaurar Paciente</button>
+          <button class="btn-paciente-lateral" (click)="seccionPacientes = 'actualizar2'">📋 Menú Actualizar</button>
+        </div>
+
+        <div class="contenedor-citas-vista main-content">
+          <ng-container [ngSwitch]="seccionPacientes">
+
+            <!-- AQUÍ VAN TUS SECCIONES -->
+            <!-- ejemplo -->
+            <form *ngSwitchCase="'registrar'" (ngSubmit)="guardarPacienteDesdeAdmin()">
+              <h2>📄 Registrar Paciente</h2>
+              <input type="text" placeholder="Nombre completo" [(ngModel)]="paciente.nombrecompleto"
+                name="nombrecompleto" required />
+              <input type="number" placeholder="Edad" [(ngModel)]="paciente.edad" name="edad" />
+              <input type="number" placeholder="NIT" [(ngModel)]="paciente.nit" name="nit" required />
+              <input type="number" placeholder="CUI" [(ngModel)]="paciente.cui" name="cui" required />
+              <input type="text" placeholder="Dirección" [(ngModel)]="paciente.direccion" name="direccion" />
+              <input type="number" placeholder="Teléfono" [(ngModel)]="paciente.telefono" name="telefono" />
+              <button type="submit">💾 Guardar Paciente</button>
+              <button type="button" (click)="limpiarCamposPaciente()">🧹 Limpiar</button>
+            </form>
+
+            <div *ngIf="pacienteComponent.mensaje && pacienteComponent.mostrarMensaje" class="mensaje-exito fade-out">
+              {{ pacienteComponent.mensaje }}
+            </div>
+            <div *ngIf="pacienteComponent.error && pacienteComponent.mostrarMensaje" class="mensaje-error fade-out">
+              {{ pacienteComponent.error }}
+            </div>
+
+            <div *ngSwitchCase="'consultar'">
+              <h2>🔍 Consultar Pacientes</h2>
+
+              <!-- Filtros múltiples -->
+              <input type="number" placeholder="Buscar por ID de Paciente" [(ngModel)]="filtroIdPaciente"
+                name="filtroIdPaciente" />
+              <input type="text" placeholder="Buscar por NIT" [(ngModel)]="filtroNitPaciente"
+                name="filtroNitPaciente" />
+              <input type="text" placeholder="Buscar por CUI" [(ngModel)]="filtroCuiPaciente"
+                name="filtroCuiPaciente" />
+              <input type="text" placeholder="Buscar por Nombre" [(ngModel)]="filtroNombrePaciente"
+                name="filtroNombrePaciente" />
+              <input type="text" placeholder="Buscar por Dirección" [(ngModel)]="filtroDireccionPaciente"
+                name="filtroDireccionPaciente" />
+              <input type="text" placeholder="Buscar por Teléfono" [(ngModel)]="filtroTelefonoPaciente"
+                name="filtroTelefonoPaciente" />
+              <input type="date" [(ngModel)]="filtroFechaPaciente" name="filtroFechaPaciente" />
+
+
+              <div class="botones-consulta">
+                <button (click)="buscarPacientePorIdDesdeAdmin()">🔍 Buscar por ID</button>
+                <button (click)="buscarPacientePorNit()">🔍 Buscar por NIT</button>
+                <button (click)="buscarPacientePorCui()">🔍 Buscar por CUI</button>
+                <button (click)="buscarPacientePorNombre()">🔍 Buscar por Nombre</button>
+                <button (click)="buscarPacientePorDireccion()">🔍 Buscar por Dirección</button>
+                <button (click)="buscarPacientePorTelefono()">🔍 Buscar por Teléfono</button>
+                <button (click)="buscarPacientePorFecha()">📅 Buscar por Fecha</button>
+                <button (click)="consultarPacientesDesdeAdmin()">📋 Ver Todos</button>
+                <button (click)="limpiarConsultaPacientes()">🧹 Limpiar</button>
+              </div>
+
+
+              <!-- Mensajes -->
+              <div *ngIf="pacienteComponent.mensaje && pacienteComponent.mostrarMensaje" class="mensaje-exito fade-out">
+                {{ pacienteComponent.mensaje }}
+              </div>
+              <div *ngIf="pacienteComponent.error && pacienteComponent.mostrarMensaje" class="mensaje-error fade-out">
+                {{ pacienteComponent.error }}
+              </div>
+
+              <!-- Tabla de pacientes -->
+              <table *ngIf="pacientesMostrados.length > 0" class="tabla-citas">
+                <thead>
+                  <tr>
+                    <th>ID Paciente</th>
+                    <th>Nombre</th>
+                    <th>Edad</th>
+                    <th>NIT</th>
+                    <th>CUI</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let p of pacientesMostrados">
+                    <td>{{ p.idpaciente }}</td>
+                    <td>{{ p.nombrecompleto }}</td>
+                    <td>{{ p.edad }}</td>
+                    <td>{{ p.nit }}</td>
+                    <td>{{ p.cui }}</td>
+                    <td>{{ p.direccion }}</td>
+                    <td>{{ p.telefono }}</td>
+                    <td>{{ p.fecha | date: 'dd/MM/yyyy' }}</td>
+
+                  </tr>
+                </tbody>
+              </table>
+
+              <div *ngIf="pacientesMostrados.length === 0 && pacienteComponent.mostrarPacientes" class="mensaje-error">
+                ⚠️ No se encontraron pacientes.
+              </div>
+            </div>
+
+            <!-- Sección: Eliminar Paciente -->
+            <div *ngSwitchCase="'eliminar'">
+              <h2>❌ Eliminar Paciente</h2>
+              <input type="number" placeholder="ID del paciente a eliminar" [(ngModel)]="filtroIdEliminarPaciente" />
+              <div class="botones-consulta">
+                <button (click)="eliminarPacienteDesdeAdmin()">🗑️ Eliminar</button>
+                <button (click)="filtroIdEliminarPaciente = null">🧹 Limpiar</button>
+              </div>
+
+
+            </div>
+
+            <!-- Sección: Restaurar Paciente -->
+            <div *ngSwitchCase="'restaurar'">
+              <h2>♻️ Restaurar Paciente</h2>
+              <input type="number" placeholder="ID del paciente a restaurar" [(ngModel)]="filtroIdRestaurarPaciente" />
+              <div class="botones-consulta">
+                <button (click)="restaurarPacienteDesdeAdmin()">🔄 Restaurar</button>
+                <button (click)="filtroIdRestaurarPaciente = null">🧹 Limpiar</button>
+              </div>
+
+
+            </div>
+
+            <!-- Sección: Menú Actualizar Paciente -->
+            <div *ngSwitchCase="'actualizar2'">
+              <h2>📋 Menú de Actualización Individual</h2>
+
+              <div class="menu-actualizar-formulario">
+                <div class="menu-actualizar-opciones">
+                  <button class="menu-actualizar-btn" (click)="pacienteComponent.campoSeleccionado = 'nombre'">✏️
+                    Nombre</button>
+                  <button class="menu-actualizar-btn" (click)="pacienteComponent.campoSeleccionado = 'edad'">🎂
+                    Edad</button>
+                  <button class="menu-actualizar-btn" (click)="pacienteComponent.campoSeleccionado = 'direccion'">🏡
+                    Dirección</button>
+                  <button class="menu-actualizar-btn" (click)="pacienteComponent.campoSeleccionado = 'nit'">🧾
+                    NIT</button>
+                  <button class="menu-actualizar-btn" (click)="pacienteComponent.campoSeleccionado = 'cui'">🆔
+                    CUI</button>
+                  <button class="menu-actualizar-btn" (click)="pacienteComponent.campoSeleccionado = 'telefono'">📞
+                    Teléfono</button>
+                </div>
+
+                <!-- Campo: Nombre -->
+                <div *ngIf="pacienteComponent.campoSeleccionado === 'nombre'">
+
+                  <h3>ID Paciente</h3>
+                  <input type="number" [(ngModel)]="pacienteComponent.idActualizar" placeholder="ID del paciente" />
+                  <h3>Nuevo Nombre Del Paciente</h3>
+                  <input type="text" [(ngModel)]="pacienteComponent.nuevoValor" placeholder="Nuevo nombre" />
+                  <button
+                    (click)="pacienteComponent.actualizarNombre(pacienteComponent.idActualizar!, pacienteComponent.nuevoValor)">Actualizar
+                    Nombre</button>
+                  <button (click)="pacienteComponent.limpiarCampos()">Limpiar</button>
+                </div>
+
+                <!-- Campo: Edad -->
+                <div *ngIf="pacienteComponent.campoSeleccionado === 'edad'">
+                  <h3>ID Paciente</h3>
+                  <input type="number" [(ngModel)]="pacienteComponent.idActualizar" placeholder="ID del paciente" />
+                  <h3>Nueva Edad Del Paciente</h3>
+                  <input type="number" [(ngModel)]="pacienteComponent.nuevoValor" placeholder="Nueva edad" />
+                  <button
+                    (click)="pacienteComponent.actualizarEdad(pacienteComponent.idActualizar!, pacienteComponent.nuevoValor)">Actualizar
+                    Edad</button>
+                  <button (click)="pacienteComponent.limpiarCampos()">Limpiar</button>
+                </div>
+
+                <!-- Campo: Dirección -->
+                <div *ngIf="pacienteComponent.campoSeleccionado === 'direccion'">
+                  <h3>ID Paciente</h3>
+                  <input type="number" [(ngModel)]="pacienteComponent.idActualizar" placeholder="ID del paciente" />
+                  <h3>Nueva Direccion Del Paciente</h3>
+                  <input type="text" [(ngModel)]="pacienteComponent.nuevoValor" placeholder="Nueva dirección" />
+                  <button
+                    (click)="pacienteComponent.actualizarDireccion(pacienteComponent.idActualizar!, pacienteComponent.nuevoValor)">Actualizar
+                    Dirección</button>
+                  <button (click)="pacienteComponent.limpiarCampos()">Limpiar</button>
+                </div>
+
+                <!-- Campo: NIT -->
+                <div *ngIf="pacienteComponent.campoSeleccionado === 'nit'">
+                  <h3>ID Paciente</h3>
+                  <input type="number" [(ngModel)]="pacienteComponent.idActualizar" placeholder="ID del paciente" />
+                  <h3>Nuevo Nit Del Paciente</h3>
+                  <input type="number" [(ngModel)]="pacienteComponent.nuevoValor" placeholder="Nuevo NIT" />
+                  <button
+                    (click)="pacienteComponent.actualizarNit(pacienteComponent.idActualizar!, pacienteComponent.nuevoValor)">Actualizar
+                    NIT</button>
+                  <button (click)="pacienteComponent.limpiarCampos()">Limpiar</button>
+                </div>
+
+                <!-- Campo: CUI -->
+                <div *ngIf="pacienteComponent.campoSeleccionado === 'cui'">
+                  <h3>ID Paciente</h3>
+                  <input type="number" [(ngModel)]="pacienteComponent.idActualizar" placeholder="ID del paciente" />
+                  <h3>Nuevo Cui Del Paciente</h3>
+                  <input type="number" [(ngModel)]="pacienteComponent.nuevoValor" placeholder="Nuevo CUI" />
+                  <button
+                    (click)="pacienteComponent.actualizarCui(pacienteComponent.idActualizar!, pacienteComponent.nuevoValor)">Actualizar
+                    CUI</button>
+                  <button (click)="pacienteComponent.limpiarCampos()">Limpiar</button>
+                </div>
+
+                <!-- Campo: Teléfono -->
+                <div *ngIf="pacienteComponent.campoSeleccionado === 'telefono'">
+                  <h3>ID Paciente</h3>
+                  <input type="number" [(ngModel)]="pacienteComponent.idActualizar" placeholder="ID del paciente" />
+                  <h3>Nuevo Telefono Del Paciente</h3>
+                  <input type="number" [(ngModel)]="pacienteComponent.nuevoValor" placeholder="Nuevo teléfono" />
+                  <button
+                    (click)="pacienteComponent.actualizarTelefono(pacienteComponent.idActualizar!, pacienteComponent.nuevoValor)">Actualizar
+                    Teléfono</button>
+                  <button (click)="pacienteComponent.limpiarCampos()">Limpiar</button>
+                </div>
+
+              </div>
+            </div>
+
+
+
+
+
+
+          </ng-container>
+        </div>
+      </div>
+
+
+
+      <!-- Módulo Doctor -->
+      <div *ngSwitchCase="'doctor'">
+        <div class="barra-citas-horizontal">
+          <button class="btn-paciente-lateral" (click)="seccionDoctor = 'registrar'">📝 Registrar Doctores</button>
+          <button class="btn-paciente-lateral" (click)="seccionDoctor = 'consultar'">🔍 Consultar Doctores</button>
+          <button class="btn-paciente-lateral" (click)="seccionDoctor = 'eliminar'">❌ Eliminar Doctor</button>
+          <button class="btn-paciente-lateral" (click)="seccionDoctor = 'restaurar'">♻️ Restaurar Doctor</button>
+          <button class="btn-paciente-lateral" (click)="seccionDoctor = 'actualizar2'">📋 Menu Actualizar</button>
+        </div>
+
+        <div class="contenedor-citas-vista main-content">
+          <ng-container [ngSwitch]="seccionDoctor">
+
+            <!-- Sección: Registrar -->
+            <!-- Sección: Registrar Doctor -->
+            <div *ngSwitchCase="'registrar'">
+              <h2>📝 Registrar Doctor</h2>
+
+              <form (ngSubmit)="guardarDoctorDesdeAdmin()" #formDoctor="ngForm">
+                <input type="text" placeholder="Colegiado" [(ngModel)]="doctor.colegiado" name="colegiado" required />
+                <input type="text" placeholder="Nombre Completo" [(ngModel)]="doctor.nombrecompleto"
+                  name="nombrecompleto" required />
+                <input type="text" placeholder="Especialidad" [(ngModel)]="doctor.especialidad" name="especialidad"
+                  required />
+                <input type="text" placeholder="Dirección" [(ngModel)]="doctor.direccion" name="direccion" />
+                <input type="text" placeholder="Centro Hospitalario" [(ngModel)]="doctor.centrohospitalario"
+                  name="centrohospitalario" />
+                <input type="number" placeholder="Edad" [(ngModel)]="doctor.edad" name="edad" required />
+                <input type="text" placeholder="Observación" [(ngModel)]="doctor.observacion" name="observacion" />
+
+
+                <button type="submit">💾 Guardar Doctor</button>
+                <button type="button" (click)="limpiarCamposDoctor()">🧹 Limpiar</button>
+              </form>
+
+              <!-- Mensajes de éxito o error -->
+              <div *ngIf="doctorComponent.mensaje && doctorComponent.mostrarMensaje" class="mensaje-exito fade-out">
+                {{ doctorComponent.mensaje }}
+              </div>
+              <div *ngIf="doctorComponent.error && doctorComponent.mostrarMensaje" class="mensaje-error fade-out">
+                {{ doctorComponent.error }}
+              </div>
+            </div>
+
+
+            <!-- Sección: Consultar -->
+            <div *ngSwitchCase="'consultar'">
+              <h2>🔍 Consultar Doctores</h2>
+
+              <!-- Filtros múltiples -->
+              <input type="number" placeholder="Buscar por ID de Doctor" [(ngModel)]="filtroIdDoctor"
+                name="filtroIdDoctor" />
+              <input type="text" placeholder="Buscar por Nombre" [(ngModel)]="filtroNombreDoctor"
+                name="filtroNombreDoctor" />
+              <input type="text" placeholder="Buscar por Colegiado" [(ngModel)]="filtroColegiadoDoctor"
+                name="filtroColegiadoDoctor" />
+              <input type="text" placeholder="Buscar por Especialidad" [(ngModel)]="filtroEspecialidadDoctor"
+                name="filtroEspecialidadDoctor" />
+              <input type="text" placeholder="Buscar por Centro Hospitalario" [(ngModel)]="filtroCentroDoctor"
+                name="filtroCentroDoctor" />
+              <input type="date" placeholder="Buscar por Fecha" [(ngModel)]="filtroFechaDoctor"
+                name="filtroFechaDoctor" />
+
+              <div class="botones-consulta">
+                <button (click)="buscarDoctorPorIdDesdeAdmin()">🔍 Buscar por ID</button>
+                <button (click)="buscarDoctorPorNombre()">🔍 Buscar por Nombre</button>
+                <button (click)="buscarDoctorPorColegiado()">🔍 Buscar por Colegiado</button>
+                <button (click)="buscarDoctorPorEspecialidad()">🔍 Buscar por Especialidad</button>
+                <button (click)="buscarDoctorPorCentro()">🔍 Buscar por Centro Hospitalario</button>
+                <button (click)="buscarDoctorPorFecha()">📅 Buscar por Fecha</button>
+                <button (click)="consultarDoctoresDesdeAdmin()">📋 Ver Todos</button>
+                <button (click)="limpiarConsultaDoctores()">🧹 Limpiar</button>
+              </div>
+
+              <!-- Tabla de doctores -->
+              <table *ngIf="doctoresMostrados.length > 0" class="tabla-citas">
+                <thead>
+                  <tr>
+                    <th>ID Doctor</th>
+                    <th>Nombre</th>
+                    <th>Colegiado</th>
+                    <th>Especialidad</th>
+                    <th>Dirección</th>
+                    <th>Centro Hospitalario</th>
+                    <th>Edad</th>
+                    <th>Fecha Registro</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let d of doctoresMostrados">
+                    <td>{{ d.iddoctor }}</td>
+                    <td>{{ d.nombrecompleto }}</td>
+                    <td>{{ d.colegiado }}</td>
+                    <td>{{ d.especialidad }}</td>
+                    <td>{{ d.direccion }}</td>
+                    <td>{{ d.centrohospitalario }}</td>
+                    <td>{{ d.edad }}</td>
+                    <td>{{ d.fecharegistro | date:'dd/MM/yyyy' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div *ngIf="doctoresMostrados.length === 0 && doctorComponent.mostrarDoctores" class="mensaje-error">
+                ⚠️ No se encontraron doctores.
+              </div>
+            </div>
+
+
+            <div *ngSwitchCase="'eliminar'">
+              <h2>❌ Eliminar Doctor</h2>
+              <input type="number" placeholder="ID del doctor a eliminar" [(ngModel)]="filtroIdEliminarDoctor" />
+              <div class="botones-consulta">
+                <button (click)="eliminarDoctorDesdeAdmin()">🗑️ Eliminar</button>
+                <button (click)="filtroIdEliminarDoctor = null">🧹 Limpiar</button>
+              </div>
+
+              <!-- Mensajes -->
+              <div *ngIf="doctorComponent.mensaje && doctorComponent.mostrarMensaje" class="mensaje-exito fade-out">
+                {{ doctorComponent.mensaje }}
+              </div>
+              <div *ngIf="doctorComponent.error && doctorComponent.mostrarMensaje" class="mensaje-error fade-out">
+                {{ doctorComponent.error }}
+              </div>
+            </div>
+
+
+            <div *ngSwitchCase="'restaurar'">
+              <h2>♻️ Restaurar Doctor</h2>
+              <input type="number" placeholder="ID del doctor a restaurar" [(ngModel)]="filtroIdRestaurarDoctor" />
+              <div class="botones-consulta">
+                <button (click)="restaurarDoctorDesdeAdmin()">🔄 Restaurar</button>
+                <button (click)="filtroIdRestaurarDoctor = null">🧹 Limpiar</button>
+              </div>
+
+              <!-- Mensajes -->
+              <div *ngIf="doctorComponent.mensaje && doctorComponent.mostrarMensaje" class="mensaje-exito fade-out">
+                {{ doctorComponent.mensaje }}
+              </div>
+              <div *ngIf="doctorComponent.error && doctorComponent.mostrarMensaje" class="mensaje-error fade-out">
+                {{ doctorComponent.error }}
+              </div>
+            </div>
+
+
+            <div *ngSwitchCase="'actualizar2'">
+              <h2>📋 Menú de Actualización Individual del Doctor</h2>
+
+              <div class="menu-actualizar-formulario">
+                <div class="menu-actualizar-opciones">
+                  <button class="menu-actualizar-btn" (click)="doctorComponent.campoSeleccionado = 'nombre'">✏️
+                    Nombre</button>
+                  <button class="menu-actualizar-btn" (click)="doctorComponent.campoSeleccionado = 'colegiado'">🧾
+                    Colegiado</button>
+                  <button class="menu-actualizar-btn" (click)="doctorComponent.campoSeleccionado = 'especialidad'">📚
+                    Especialidad</button>
+                  <button class="menu-actualizar-btn" (click)="doctorComponent.campoSeleccionado = 'direccion'">🏡
+                    Dirección</button>
+                  <button class="menu-actualizar-btn" (click)="doctorComponent.campoSeleccionado = 'centro'">🏥 Centro
+                    Hospitalario</button>
+                  <button class="menu-actualizar-btn" (click)="doctorComponent.campoSeleccionado = 'edad'">🎂
+                    Edad</button>
+                  <button class="menu-actualizar-btn" (click)="doctorComponent.campoSeleccionado = 'observacion'">📝
+                    Observación</button>
+                </div>
+
+                <!-- Campo: Nombre -->
+                <div *ngIf="doctorComponent.campoSeleccionado === 'nombre'">
+                  <h3>ID Doctor</h3>
+                  <input type="number" [(ngModel)]="doctorComponent.doctorActualizar.iddoctor"
+                    placeholder="ID del doctor" />
+                  <h3>Nuevo Nombre</h3>
+                  <input type="text" [(ngModel)]="doctorComponent.doctorActualizar.nombrecompleto"
+                    placeholder="Nuevo nombre completo" />
+                  <button (click)="doctorComponent.actualizarNombreDoctor()">Actualizar Nombre</button>
+                  <button (click)="doctorComponent.limpiarActualizarDoctor()">Limpiar</button>
+                </div>
+
+                <!-- Campo: Colegiado -->
+                <div *ngIf="doctorComponent.campoSeleccionado === 'colegiado'">
+                  <h3>ID Doctor</h3>
+                  <input type="number" [(ngModel)]="doctorComponent.doctorActualizar.iddoctor"
+                    placeholder="ID del doctor" />
+                  <h3>Nuevo Colegiado</h3>
+                  <input type="text" [(ngModel)]="doctorComponent.doctorActualizar.colegiado"
+                    placeholder="Nuevo colegiado" />
+                  <button (click)="doctorComponent.actualizarColegiadoDoctor()">Actualizar Colegiado</button>
+                  <button (click)="doctorComponent.limpiarActualizarDoctor()">Limpiar</button>
+                </div>
+
+                <!-- Campo: Especialidad -->
+                <div *ngIf="doctorComponent.campoSeleccionado === 'especialidad'">
+                  <h3>ID Doctor</h3>
+                  <input type="number" [(ngModel)]="doctorComponent.doctorActualizar.iddoctor"
+                    placeholder="ID del doctor" />
+                  <h3>Nueva Especialidad</h3>
+                  <input type="text" [(ngModel)]="doctorComponent.doctorActualizar.especialidad"
+                    placeholder="Nueva especialidad" />
+                  <button (click)="doctorComponent.actualizarEspecialidadDoctor()">Actualizar Especialidad</button>
+                  <button (click)="doctorComponent.limpiarActualizarDoctor()">Limpiar</button>
+                </div>
+
+                <!-- Campo: Dirección -->
+                <div *ngIf="doctorComponent.campoSeleccionado === 'direccion'">
+                  <h3>ID Doctor</h3>
+                  <input type="number" [(ngModel)]="doctorComponent.doctorActualizar.iddoctor"
+                    placeholder="ID del doctor" />
+                  <h3>Nueva Dirección</h3>
+                  <input type="text" [(ngModel)]="doctorComponent.doctorActualizar.direccion"
+                    placeholder="Nueva dirección" />
+                  <button (click)="doctorComponent.actualizarDireccionDoctor()">Actualizar Dirección</button>
+                  <button (click)="doctorComponent.limpiarActualizarDoctor()">Limpiar</button>
+                </div>
+
+                <!-- Campo: Centro Hospitalario -->
+                <div *ngIf="doctorComponent.campoSeleccionado === 'centro'">
+                  <h3>ID Doctor</h3>
+                  <input type="number" [(ngModel)]="doctorComponent.doctorActualizar.iddoctor"
+                    placeholder="ID del doctor" />
+                  <h3>Nuevo Centro</h3>
+                  <input type="text" [(ngModel)]="doctorComponent.doctorActualizar.centrohospitalario"
+                    placeholder="Nuevo centro hospitalario" />
+                  <button (click)="doctorComponent.actualizarCentroDoctor()">Actualizar Centro</button>
+                  <button (click)="doctorComponent.limpiarActualizarDoctor()">Limpiar</button>
+                </div>
+
+                <!-- Campo: Edad -->
+                <div *ngIf="doctorComponent.campoSeleccionado === 'edad'">
+                  <h3>ID Doctor</h3>
+                  <input type="number" [(ngModel)]="doctorComponent.doctorActualizar.iddoctor"
+                    placeholder="ID del doctor" />
+                  <h3>Nueva Edad</h3>
+                  <input type="number" [(ngModel)]="doctorComponent.doctorActualizar.edad" placeholder="Nueva edad" />
+                  <button (click)="doctorComponent.actualizarEdadDoctor()">Actualizar Edad</button>
+                  <button (click)="doctorComponent.limpiarActualizarDoctor()">Limpiar</button>
+                </div>
+
+                <!-- Campo: Observación -->
+                <div *ngIf="doctorComponent.campoSeleccionado === 'observacion'">
+                  <h3>ID Doctor</h3>
+                  <input type="number" [(ngModel)]="doctorComponent.doctorActualizar.iddoctor"
+                    placeholder="ID del doctor" />
+                  <h3>Nueva Observación</h3>
+                  <input type="text" [(ngModel)]="doctorComponent.doctorActualizar.observacion"
+                    placeholder="Nueva observación" />
+                  <button (click)="doctorComponent.actualizarObservacionDoctor()">Actualizar Observación</button>
+                  <button (click)="doctorComponent.limpiarActualizarDoctor()">Limpiar</button>
+                </div>
+
+                <!-- ✅ Mensajes de éxito o error -->
+                <div *ngIf="doctorComponent.mensaje && doctorComponent.mostrarMensaje" class="mensaje-exito fade-out">
+                  {{ doctorComponent.mensaje }}
+                </div>
+                <div *ngIf="doctorComponent.error && doctorComponent.mostrarMensaje" class="mensaje-error fade-out">
+                  {{ doctorComponent.error }}
+                </div>
+
+              </div>
+            </div>
+
+
+          </ng-container>
+        </div>
+      </div>
+
+
+      <!-- Módulo Login -->
+      <div *ngSwitchCase="'login'">
+        <h2>🔐 módulo login - administración de usuarios</h2>
+
+        <div class="barra-citas-horizontal">
+          <button class="btn-citas-lateral" (click)="seccionLogin = 'registrar'">📄 Registrar usuario</button>
+          <button class="btn-citas-lateral" (click)="seccionLogin = 'consultar'">📋 Consultar usuarios</button>
+          <button class="btn-citas-lateral" (click)="seccionLogin = 'actualizar'">✏️ Cambiar contraseña</button>
+          <button class="btn-citas-lateral" (click)="seccionLogin = 'borrar'">❌ Borrar usuario</button>
+          <button class="btn-citas-lateral" (click)="seccionLogin = 'restaurar'">♻️ Restaurar usuario</button>
+          <button class="btn-citas-lateral" (click)="seccionLogin = 'rol'">✏️ Cambiar ROL</button>
+        </div>
+
+        <div class="contenedor-citas-vista main-content">
+          <ng-container [ngSwitch]="seccionLogin">
+
+            <div *ngSwitchCase="'registrar'">
+              <h3>📄 Registrar Usuario</h3>
+
+              <form (ngSubmit)="guardarUsuarioDesdeAdmin()" class="formulario-login">
+                <input type="text" [(ngModel)]="usuario.username" name="username" placeholder="Nombre de usuario"
+                  required />
+                <input type="password" [(ngModel)]="usuario.password" name="password" placeholder="Contraseña"
+                  required />
+
+                <!-- Selección de rol -->
+                <select [(ngModel)]="usuario.rol" name="rol" required>
+                  <option value="" disabled>Seleccione un rol</option>
+                  <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+                  <option value="RECEPCIONISTA">RECEPCIONISTA</option>
+                  <option value="DOCTOR">DOCTOR</option>
+                </select>
+
+                <!-- Selección de jwt_secret -->
+                <select [(ngModel)]="usuario.jwtSecret" name="jwtSecret" required>
+                  <option value="" disabled selected>Seleccione el JWT Secret</option>
+                  <option value="jwt_secreto_administrador_123456">Administrador</option>
+                  <option value="jwt_secreto_recepcionista_123456">Recepcionista</option>
+                  <option value="jwt_secreto_doctormedicina_123456">Doctor</option>
+                </select>
+
+                <div class="botones-formulario-login">
+                  <button type="submit">✅ Guardar Usuario</button>
+                  <button type="button" (click)="limpiarFormularioUsuario()">🧹 Limpiar</button>
+                </div>
+              </form>
+
+              <div *ngIf="mensajeUsuarioExito" class="mensaje-exito fade-out">{{ mensajeUsuarioExito }}</div>
+              <div *ngIf="mensajeUsuarioError" class="mensaje-error fade-out">{{ mensajeUsuarioError }}</div>
+            </div>
+
+
+            <div *ngSwitchCase="'consultar'">
+              <h3>📋 Consulta de Usuarios</h3>
+
+              <div class="filtros-usuarios">
+                <input type="number" [(ngModel)]="filtroIdUsuario" placeholder="Buscar por ID">
+                <input type="text" [(ngModel)]="filtroUsernameUsuario" placeholder="Buscar por Username">
+                <select [(ngModel)]="filtroEstadoUsuario">
+                  <option value="TODOS">Todos</option>
+                  <option value="ACTIVO">Activos</option>
+                  <option value="INACTIVO">Inactivos</option>
+                </select>
+                <button (click)="consultarUsuariosDesdeAdmin()">🔍 Buscar</button>
+                <button (click)="limpiarConsultaUsuarios()">🧹 Limpiar</button>
+              </div>
+
+              <table *ngIf="usuariosMostrados.length > 0" class="tabla-usuarios">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let u of usuariosMostrados">
+                    <td>{{ u.id }}</td>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.rol }}</td>
+                    <td>{{ u.estado }}</td>
+                    <td>{{ u.fechaCreacion }}</td>
+                    <td>{{ u.horaCreacion }}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div *ngIf="usuariosMostrados.length === 0" class="mensaje-error">
+                ⚠️ No hay resultados para mostrar.
+              </div>
+            </div>
+
+
+            <!-- Sección: Cambiar Contraseña -->
+            <div *ngSwitchCase="'actualizar'">
+              <h2>✏️ Cambiar Contraseña de Usuario</h2>
+
+              <form (ngSubmit)="cambiarPasswordDesdeAdmin()">
+                <h3>ID Usuario</h3>
+                <input type="number" [(ngModel)]="idCambioPassword" name="idCambioPassword" placeholder="ID del Usuario"
+                  required />
+                <h3>Nueva Contraseña</h3>
+                <input type="password" [(ngModel)]="nuevaPassword" name="nuevaPassword" placeholder="Nueva Contraseña"
+                  required />
+
+                <button type="submit">💾 Cambiar Contraseña</button>
+                <button type="button" (click)="limpiarCambioPassword()">🧹 Limpiar</button>
+              </form>
+
+              <div *ngIf="mensajeCambioPassword" class="mensaje-exito fade-out">
+                {{ mensajeCambioPassword }}
+              </div>
+            </div>
+
+
+            <!-- Sección: Borrar Usuario -->
+            <div *ngSwitchCase="'borrar'">
+              <h2>❌ Desactivar Usuario</h2>
+
+              <h3>ID Usuario</h3>
+              <input type="number" placeholder="ID del usuario a desactivar" [(ngModel)]="idDesactivarUsuario" />
+
+              <div class="botones-consulta">
+                <button (click)="desactivarUsuarioDesdeAdmin()">❌ Desactivar</button>
+                <button (click)="idDesactivarUsuario = 0">🧹 Limpiar</button>
+              </div>
+
+              <div *ngIf="mensajeDesactivarUsuario" class="mensaje-exito fade-out">
+                {{ mensajeDesactivarUsuario }}
+              </div>
+            </div>
+
+
+            <!-- Sección: Restaurar Usuario -->
+            <div *ngSwitchCase="'restaurar'">
+              <h2>♻️ Restaurar Usuario</h2>
+
+              <h3>ID Usuario</h3>
+              <input type="number" placeholder="ID del usuario a restaurar" [(ngModel)]="idRestaurarUsuario" />
+
+              <div class="botones-consulta">
+                <button (click)="restaurarUsuarioDesdeAdmin()">♻️ Restaurar</button>
+                <button (click)="idRestaurarUsuario = 0">🧹 Limpiar</button>
+              </div>
+
+              <div *ngIf="mensajeRestaurarUsuario" class="mensaje-exito fade-out">
+                {{ mensajeRestaurarUsuario }}
+              </div>
+            </div>
+
+
+            <!-- Sección: Cambiar Rol -->
+            <div *ngSwitchCase="'rol'">
+              <h2>✏️ Cambiar Rol y JWT de Usuario</h2>
+
+              <form (ngSubmit)="cambiarRolManual()">
+                <h3>ID Usuario</h3>
+                <input type="number" [(ngModel)]="idCambioRol" name="idCambioRol" placeholder="ID del Usuario"
+                  required />
+
+                <h3>Nuevo Rol</h3>
+                <select [(ngModel)]="nuevoRol" name="nuevoRol" required>
+                  <option value="" disabled>Seleccione nuevo rol</option>
+                  <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+                  <option value="RECEPCIONISTA">RECEPCIONISTA</option>
+                  <option value="DOCTOR">DOCTOR</option>
+                </select>
+
+                <h3>Nuevo JWT Secret</h3>
+                <select [(ngModel)]="nuevoJwtSecret" name="nuevoJwtSecret" required>
+                  <option value="" disabled>Seleccione nuevo JWT</option>
+                  <option value="jwt_secreto_administrador_123456">Administrador</option>
+                  <option value="jwt_secreto_recepcionista_123456">Recepcionista</option>
+                  <option value="jwt_secreto_doctormedicina_123456">Doctor</option>
+                </select>
+
+                <button type="submit">✔ Cambiar Rol</button>
+                <button type="button" (click)="limpiarCambioRol()">🧹 Limpiar</button>
+              </form>
+
+              <div *ngIf="mensajeCambioRol" class="mensaje-exito fade-out">
+                {{ mensajeCambioRol }}
+              </div>
+            </div>
+
+
+          </ng-container>
+        </div>
+      </div>
+
+
+      <!-- Módulo Citas Unificado -->
+      <div *ngSwitchCase="'citas'">
+        <!-- Opciones de Citas -->
+        <div class="barra-citas-horizontal">
+          <button class="btn-citas-lateral" (click)="seccionCitas = 'crear'">📄 Crear Cita</button>
+          <button class="btn-citas-lateral" (click)="seccionCitas = 'consultar'">🔍 Consultar Citas</button>
+          <button class="btn-citas-lateral" (click)="seccionCitas = 'realizada'">✅ Marcar como
+            Realizada</button>
+          <button class="btn-citas-lateral" (click)="seccionCitas = 'cancelada'">❌ Marcar como
+            Cancelada</button>
+          <button class="btn-citas-lateral" (click)="seccionCitas = 'filtros'">📁 Historial Clínico</button>
+          <button class="btn-citas-lateral" (click)="seccionCitas = 'actualizar'">🛠️ Menú Actualizar</button>
+        </div>
+
+        <!-- Contenido de Crear Cita -->
+        <div class="contenedor-citas-vista main-content">
+          <ng-container [ngSwitch]="seccionCitas">
+
+            <form *ngSwitchCase="'crear'" (ngSubmit)="crearCitaDesdeAdmin()">
+              <h2>📅 Nueva Cita</h2>
+
+              <input type="text" placeholder="Paciente" [(ngModel)]="nuevaCita.nombrecompleto_paciente"
+                name="nombrePaciente" />
+              <input type="text" placeholder="NIT" [(ngModel)]="nuevaCita.nit" name="nit" />
+              <input type="text" placeholder="Doctor" [(ngModel)]="nuevaCita.nombrecompleto_doctor"
+                name="nombreDoctor" />
+              <input type="text" placeholder="Colegiado" [(ngModel)]="nuevaCita.colegiado" name="colegiado" />
+              <input type="datetime-local" [(ngModel)]="nuevaCita.fechacita" name="fechacita" />
+              <input type="text" placeholder="Motivo" [(ngModel)]="nuevaCita.motivoconsulta" name="motivo" />
+              <input type="email" placeholder="Correo" [(ngModel)]="nuevaCita.correo" name="correo" />
+              <button type="submit">💾 Guardar</button>
+              <button type="button" (click)="limpiarCamposCita()">🧹 Limpiar</button>
+
+            </form>
+
+
+            <div *ngIf="citasComponent.mensaje && citasComponent.mostrarMensaje" class="mensaje-exito fade-out">
+              {{ citasComponent.mensaje }}
+            </div>
+
+            <div *ngIf="citasComponent.error && citasComponent.mostrarMensaje" class="mensaje-error fade-out">
+              {{ citasComponent.error }}
+            </div>
+
+            <div *ngSwitchCase="'consultar'">
+              <h2>🔍 Consultar Citas</h2>
+
+              <input type="number" placeholder="Buscar por ID de Cita" [(ngModel)]="filtroIdCita" name="filtroIdCita" />
+              <input type="date" placeholder="Buscar por Fecha" [(ngModel)]="filtroFecha" name="filtroFecha" />
+
+              <div class="botones-consulta">
+                <button (click)="buscarCitaPorId()">🔍 Buscar por ID</button>
+                <button (click)="buscarCitasPorFecha()">📅 Buscar por Fecha</button>
+                <button (click)="consultarCitasProgramadas()">📌 Ver Programadas</button>
+                <button (click)="consultarCitasRealizadas()">✅ Ver Realizadas</button>
+                <button (click)="consultarCitasCanceladas()">❌ Ver Canceladas</button>
+                <button (click)="limpiarConsultaCitas()">🧹 Limpiar</button>
+              </div>
+
+              <div *ngIf="citasComponent.mensaje && citasComponent.mostrarMensaje" class="mensaje-exito fade-out">
+                {{ citasComponent.mensaje }}
+              </div>
+              <div *ngIf="citasComponent.error && citasComponent.mostrarMensaje" class="mensaje-error fade-out">
+                {{ citasComponent.error }}
+              </div>
+
+              <table *ngIf="citasMostradas.length > 0" class="tabla-citas">
+                <thead>
+                  <tr>
+                    <th>Id Cita</th>
+                    <th>Paciente</th>
+                    <th>NIT</th>
+                    <th>Doctor</th>
+                    <th>Colegiado</th>
+                    <th>Fecha</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                    <th>Costo</th>
+                    <th>Fin</th>
+                    <th>Motivo Cancelacion</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cita of citasMostradas">
+
+
+                    <td>{{ cita.idcita }}</td>
+                    <td>{{ cita.nombrecompletoPaciente }}</td>
+                    <td>{{ cita.nit }}</td>
+                    <td>{{ cita.nombrecompletoDoctor }}</td>
+                    <td>{{ cita.colegiado }}</td>
+                    <td>{{ cita.fechacita | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>{{ cita.motivoconsulta }}</td>
+                    <td>
+                      <span [ngClass]="{
+                'estado-programada': cita.estado === 'PROGRAMADA',
+                'estado-realizada': cita.estado === 'REALIZADA',
+                'estado-cancelada': cita.estado === 'CANCELADA'
+              }">{{ cita.estado }}</span>
+                    </td>
+
+                    <td>{{ cita.costo || '---' }}</td>
+                    <td>{{ cita.fechaFin ? (cita.fechaFin | date:'dd/MM/yyyy HH:mm') : '---' }}</td>
+                    <td>{{ cita.motivocancelacion || '---'}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Sección: Marcar como Realizada -->
+            <div *ngSwitchCase="'realizada'">
+              <h2>✅ Marcar Cita como Realizada</h2>
+
+              <input type="number" placeholder="ID de la Cita" [(ngModel)]="citasComponent.citaCambioEstado.idcita"
+                name="idcita" />
+
+              <input type="number" placeholder="Costo de la Cita" [(ngModel)]="citasComponent.citaCambioEstado.costo"
+                name="costo" />
+
+              <input type="date" placeholder="Fecha de Finalización"
+                [(ngModel)]="citasComponent.citaCambioEstado.fecha_fin" name="fechaFin" />
+
+              <div class="botones-consulta">
+                <button (click)="marcarCitaRealizadaDesdeAdmin()">✔ Marcar como Realizada</button>
+                <button (click)="limpiarCamposCambioEstado()">🧹 Limpiar</button>
+              </div>
+
+              <div *ngIf="citasComponent.mensaje && citasComponent.mostrarMensaje" class="mensaje-exito fade-out">
+                {{ citasComponent.mensaje }}
+              </div>
+
+              <div *ngIf="citasComponent.error && citasComponent.mostrarMensaje" class="mensaje-error fade-out">
+                {{ citasComponent.error }}
+              </div>
+            </div>
+
+            <!-- Sección: Marcar como Cancelada -->
+            <div *ngSwitchCase="'cancelada'">
+              <h2>❌ Cancelar Cita</h2>
+
+              <input type="number" placeholder="ID de la Cita" [(ngModel)]="citasComponent.citaCambioEstado.idcita"
+                name="idcitaCancelada" />
+
+              <input type="date" placeholder="Fecha de Cancelación"
+                [(ngModel)]="citasComponent.citaCambioEstado.fecha_fin" name="fechaCancelacion" />
+
+              <input type="text" placeholder="Motivo de Cancelación"
+                [(ngModel)]="citasComponent.citaCambioEstado.motivocancelacion" name="motivoCancelacion" />
+
+              <div class="botones-consulta">
+                <button (click)="marcarCitaCanceladaDesdeAdmin()">❌ Cancelar Cita</button>
+                <button (click)="limpiarCamposCambioEstado()">🧹 Limpiar</button>
+              </div>
+
+              <div *ngIf="citasComponent.mensaje && citasComponent.mostrarMensaje" class="mensaje-exito fade-out">
+                {{ citasComponent.mensaje }}
+              </div>
+
+              <div *ngIf="citasComponent.error && citasComponent.mostrarMensaje" class="mensaje-error fade-out">
+                {{ citasComponent.error }}
+              </div>
+            </div>
+
+            <!-- Sección: Historial Clínico -->
+            <div *ngSwitchCase="'filtros'">
+              <h2>📁 Historial Clínico - Filtros Avanzados</h2>
+
+              <input type="number" placeholder="Buscar por NIT" [(ngModel)]="filtroNit" name="filtroNit" />
+              <div class="filtros-avanzados-botones">
+                <button (click)="buscarCitasPorNit()">🔎 Buscar por NIT</button>
+              </div>
+
+              <input type="text" placeholder="Buscar por Colegiado" [(ngModel)]="filtroColegiado"
+                name="filtroColegiado" />
+              <div class="filtros-avanzados-botones">
+                <button (click)="buscarCitasPorColegiado()">📘 Buscar por Colegiado</button>
+              </div>
+
+              <div class="filtros-avanzados-botones">
+                <button (click)="resetearFiltrosCitas()">🧹 Limpiar</button>
+              </div>
+
+              <div *ngIf="citasComponent.mensaje && citasComponent.mostrarMensaje" class="mensaje-exito fade-out">
+                {{ citasComponent.mensaje }}
+              </div>
+              <div *ngIf="citasComponent.error && citasComponent.mostrarMensaje" class="mensaje-error fade-out">
+                {{ citasComponent.error }}
+              </div>
+
+              <table *ngIf="citasMostradas.length > 0" class="tabla-citas">
+                <thead>
+                  <tr>
+                    <th>Id Cita</th>
+                    <th>Paciente</th>
+                    <th>NIT</th>
+                    <th>Doctor</th>
+                    <th>Colegiado</th>
+                    <th>Fecha</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                    <th>Costo</th>
+                    <th>Fin</th>
+                    <th>Motivo Cancelación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cita of citasMostradas">
+                    <td>{{ cita.idcita }}</td>
+                    <td>{{ cita.nombrecompletoPaciente }}</td>
+                    <td>{{ cita.nit }}</td>
+                    <td>{{ cita.nombrecompletoDoctor }}</td>
+                    <td>{{ cita.colegiado }}</td>
+                    <td>{{ cita.fechacita | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>{{ cita.motivoconsulta }}</td>
+                    <td>
+                      <span [ngClass]="{
+            'estado-programada': cita.estado === 'PROGRAMADA',
+            'estado-realizada': cita.estado === 'REALIZADA',
+            'estado-cancelada': cita.estado === 'CANCELADA'
+          }">{{ cita.estado }}</span>
+                    </td>
+                    <td>{{ cita.costo || '---' }}</td>
+                    <td>{{ cita.fechaFin ? (cita.fechaFin | date:'dd/MM/yyyy HH:mm') : '---' }}</td>
+                    <td>{{ cita.motivocancelacion || '---' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Sección: Menú Actualizar -->
+            <div *ngSwitchCase="'actualizar'">
+              <h2>🛠️ Menú Actualizar Cita</h2>
+
+              <h3>ID Cita</h3>
+              <input type="number" placeholder="ID de la Cita" [(ngModel)]="citasComponent.actualizacionCita.idcita" />
+              <button (click)="cargarCitaParaActualizar()">📥 Cargar Datos</button>
+
+              <h3>Nombre del Paciente</h3>
+              <input type="text" placeholder="Nombre del Paciente"
+                [(ngModel)]="citasComponent.actualizacionCita.nombrecompleto_paciente" />
+              <button (click)="actualizarNombrePacienteCita()">✔ Cambiar</button>
+
+              <h3>Nombre del Doctor</h3>
+              <input type="text" placeholder="Nombre del Doctor"
+                [(ngModel)]="citasComponent.actualizacionCita.nombrecompleto_doctor" />
+              <button (click)="actualizarNombreDoctorCita()">✔ Cambiar</button>
+
+              <h3>Motivo de Consulta</h3>
+              <input type="text" placeholder="Motivo de Consulta"
+                [(ngModel)]="citasComponent.actualizacionCita.motivoconsulta" />
+              <button (click)="actualizarMotivoConsulta()">✔ Cambiar</button>
+
+              <div class="botones-consulta">
+                <button (click)="limpiarCamposActualizacion()">🧹 Limpiar</button>
+              </div>
+
+              <div *ngIf="citasComponent.mensaje && citasComponent.mostrarMensaje" class="mensaje-exito fade-out">
+                {{ citasComponent.mensaje }}
+              </div>
+              <div *ngIf="citasComponent.error && citasComponent.mostrarMensaje" class="mensaje-error fade-out">
+                {{ citasComponent.error }}
+              </div>
+            </div>
+
+
+
+
+
+
+          </ng-container>
+
+
+        </div>
+
+        <!-- Contenido de cada sección -->
+        <div class="contenedor-citas-vista">
+          <ng-container [ngSwitch]="seccionCitas">
+
+
+
+          </ng-container>
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+</div>

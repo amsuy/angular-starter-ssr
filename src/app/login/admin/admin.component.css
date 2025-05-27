@@ -1,0 +1,488 @@
+.admin-dashboard {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Sidebar izquierdo */
+.sidebar-admin {
+  width: 240px;
+  background-color: #032339;
+  padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  height: 100%;
+  box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-admin .logo {
+  width: 100%;
+  margin-bottom: 30px;
+  border-radius: 12px;
+}
+
+.sidebar-admin button {
+  background-color: #032339;
+  border: none;
+  color: white;
+  padding: 12px;
+  font-size: 17px;
+  text-align: left;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.sidebar-admin button:hover {
+  background-color: #859099d1;
+}
+
+/* Contenido principal */
+.contenido-admin {
+  margin-left: 240px;
+  padding: 40px 30px;
+  width: 100%;
+  background-image: url('/assets/img/fondoroladministrador.png');
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+/* Mensaje por defecto */
+.mensaje-bienvenida {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #2b6cb0;
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* PANEL DE ARRIBA  */
+
+/* Contenedor horizontal tipo barra */
+.barra-citas-horizontal {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0px;
+  padding: 15px 15px;
+  margin-left: 10px;
+  /* deja espacio para la sidebar */
+  background-color: #032339;
+  /* fondo celeste claro */
+  box-shadow: 0 2px 10px rgba(19, 92, 180, 0.08);
+  border-bottom: 1px solid #cbd5e1;
+  border-radius: 0px;
+  /* BORDES TOTALMENTE CUADRADOS */
+  position: sticky;
+  width: calc(100vw - 250px);
+  /* Resta el ancho del sidebar */
+
+  z-index: 998;
+  margin-top: -40px;
+  /* o incluso negativo si es necesario */
+
+  /* padding-left: 50px;  mueve todos los botones más a la derecha */
+}
+
+/* Botones de opciones en la barra horizontal */
+.btn-citas-lateral {
+  background-color: #032339;
+  color: #f9f9f9;
+  border: none;
+  border-radius: 0px;
+  padding: 12px 38px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-citas-lateral:hover {
+  background-color: #859099d1;
+  transform: translateY(-2px);
+}
+
+/* Contenedor de la sección activa */
+.contenedor-citas-vista {
+  box-sizing: border-box;
+  padding: 30px 50px;
+  background-color: #f8fafc;
+  min-height: auto;
+  transition: margin-left 0.3s ease;
+  width: 100%;
+  margin-left: 0;
+  margin: 0;
+
+  /* ← quitamos margen izquierdo duplicado */
+}
+
+
+/* Responsive para tablets/móviles */
+
+.barra-citas-horizontal {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0px;
+  padding: 15px;
+  background-color: #032339;
+  box-shadow: 0 2px 10px rgba(19, 92, 180, 0.08);
+  border-bottom: 1px solid #cbd5e1;
+  border-radius: 0;
+  position: fixed;
+  top: 48px;
+  left: 278px;
+  z-index: 999;
+}
+
+
+.contenedor-citas-vista {
+  margin-left: 0;
+  padding-top: 100px;
+
+
+}
+
+
+/* CREAR CITA */
+
+.formulario-cita {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #ffffff;
+  padding: 20px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  width: 100%;
+}
+
+
+.formulario-cita input {
+  width: 100%;
+  padding: 10px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+
+.formulario-cita button {
+  padding: 12px;
+  font-weight: bold;
+  background-color: #032339;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.formulario-cita button:hover {
+  background-color: #1e40af;
+}
+
+.formulario-cita input {
+  width: 100%;
+}
+
+
+
+
+
+/* Mensajes */
+.mensaje-exito {
+  background-color: #d1fae5;
+  color: #065f46;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  font-weight: bold;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.mensaje-error {
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  font-weight: bold;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+html,
+body {
+  overflow-x: hidden !important;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  /* <-- agrega esto si no lo tienes */
+}
+
+/* Haz que los inputs ocupen ancho completo como en recepcionista */
+.contenedor-citas-vista input,
+.contenedor-citas-vista select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+}
+
+/* Estilo tipo recepcionista para los botones */
+.contenedor-citas-vista button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  background-color: #032339;
+  color: white;
+  transition: all 0.2s ease-in-out;
+}
+
+.contenedor-citas-vista button:hover {
+  background-color: #4b555b;
+  cursor: pointer;
+}
+
+/* Espaciado general y scroll visible */
+.main-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.fade-out {
+  opacity: 1;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.fade-out.ng-leave {
+  opacity: 0;
+}
+
+/* CONSULTAR CITAS */
+
+.tabla-citas {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tabla-citas th,
+.tabla-citas td {
+  border: 1px solid #e2e8f0;
+  padding: 10px;
+  text-align: center;
+}
+
+.tabla-citas th {
+  background-color: #2563eb;
+  color: white;
+  font-weight: bold;
+}
+
+.tabla-citas tr:nth-child(even) {
+  background-color: #f1f5f9;
+}
+
+.botones-consulta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+/* Contenedor personalizado para botones del historial clínico */
+.filtros-avanzados-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 0px;
+  margin-bottom: 20px;
+}
+
+/* Botones más estilizados */
+.filtros-avanzados-botones button {
+  background-color: #0f172a;
+  color: #f1f5f9;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.filtros-avanzados-botones button:hover {
+  background-color: #334155;
+}
+
+/* Estilo especial para sección 'Menú Actualizar' */
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"] {
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+button {
+  margin-bottom: 15px;
+}
+
+/* MODULO PACIENTES*/
+
+/* Botones de opciones en la barra horizontal */
+.btn-paciente-lateral {
+  background-color: #032339;
+  color: #f9f9f9;
+  border: none;
+  border-radius: 0px;
+  padding: 12px 38px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-right: 45px;
+  /* o el valor que desees */
+}
+
+.btn-paciente-lateral:hover {
+  background-color: #859099d1;
+  transform: translateY(-2px);
+}
+
+.botones-consulta {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.mensaje-exito {
+  color: green;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.mensaje-error {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* MODULO LOGIN*/
+
+.filtros-usuarios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.filtros-usuarios input,
+.filtros-usuarios select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  flex: 1 1 200px;
+}
+
+.filtros-usuarios button {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.filtros-usuarios button:hover {
+  background-color: #0056b3;
+}
+
+.filtros-usuarios .limpiar {
+  background-color: #ffc107;
+  color: black;
+}
+
+.filtros-usuarios .limpiar:hover {
+  background-color: #e0a800;
+}
+
+.tabla-usuarios {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.tabla-usuarios th,
+.tabla-usuarios td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.tabla-usuarios th {
+  background-color: #343a40;
+  color: white;
+}
+
+.tabla-usuarios tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.tabla-usuarios tr:hover {
+  background-color: #e9ecef;
+}
+
+.mensaje-error {
+  margin-top: 15px;
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+

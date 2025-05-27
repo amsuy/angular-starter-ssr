@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather&display=swap');
+
+.login-page {
+  height: 100vh;
+  width: 100vw;
+  background-image: url('/assets/img/login.png'); /* tu imagen en public/assets/img */
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: #dff2ff; /* fallback celeste claro */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Caja de login mejorada */
+.login-container {
+  width: 320px;
+  padding: 25px 20px;
+  border-radius: 16px;
+  background: linear-gradient(to bottom, #e3f2fd, #bbdefb);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  border: 1px solid #90caf9;
+  text-align: center;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+
+.login-container h2 {
+  margin-bottom: 20px;
+  color: #0d47a1;
+  font-weight: bold;
+  font-size: 22px;
+}
+
+/* Inputs */
+.login-input {
+  width: 100%;
+  padding: 11px 14px;
+  margin-bottom: 14px;
+  border: 1px solid #bbdefb;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: 0.3s;
+  background-color: #ffffff;
+}
+
+.login-input:focus {
+  border-color: #42a5f5;
+  box-shadow: 0 0 5px rgba(66, 165, 245, 0.6);
+  outline: none;
+}
+
+/* Botón */
+.login-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  background-color: #0288d1;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #0277bd;
+}
+
+.login-button:disabled {
+  background-color: #b0bec5;
+  cursor: not-allowed;
+}
+
+/* Mensaje de error */
+.error-message {
+  color: red;
+  margin-top: 10px;
+  font-weight: bold;
+}

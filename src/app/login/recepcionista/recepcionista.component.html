@@ -1,0 +1,394 @@
+<div class="recepcionista-dashboard">
+  <!-- Sidebar Fija -->
+  <div class="sidebar">
+    <img src="assets/img/logo.png" alt="Hospital Logo" class="logo" />
+    <div class="user-info">👩‍⚕️ {{ username }}</div>
+
+    <button (click)="mostrarSeccion('ingresarPaciente')">➕ Ingresar Paciente</button>
+    <button (click)="mostrarSeccion('ingresarCita')">📆 Ingresar Cita</button>
+    <button (click)="mostrarSeccion('verPacientes')">📋 Ver Pacientes</button>
+    <button (click)="mostrarSeccion('verDoctores')">🩺 Ver Doctores</button>
+    <button (click)="verCitasPorEstado('programadas', 'programadas')">📌 Ver Citas Programadas</button>
+    <button (click)="verCitasPorEstado('realizadas', 'realizadas')">✅ Ver Citas Realizadas</button>
+    <button (click)="verCitasPorEstado('canceladas', 'canceladas')">❌ Ver Citas Canceladas</button>
+    <button (click)="mostrarSeccion('cambiarRealizada')">✔️ Cambiar a Realizada</button>
+    <button (click)="mostrarSeccion('cambiarCancelada')">🗑️ Cambiar a Cancelada</button>
+    <button (click)="mostrarSeccion('filtroCitas')">🔎 Filtro Citas</button>
+
+    <button (click)="limpiarPantalla()">🧹 Refrescar Pantalla</button>
+    <button (click)="cerrarSesion()">⬅ Cerrar Sesión</button>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="main-content">
+    <div class="panel-header">👩‍⚕️ Panel de Recepcionista</div>
+
+    <!-- Renderizado condicional de secciones -->
+    <ng-container [ngSwitch]="seccionActiva">
+      <div *ngSwitchCase="'ingresarPaciente'">
+        <h2>📝 Registrar Paciente</h2>
+        <form (ngSubmit)="guardarPaciente()">
+          <input type="text" placeholder="Nombre completo" [(ngModel)]="paciente.nombrecompleto" name="nombrecompleto">
+          <input type="number" placeholder="Edad" [(ngModel)]="paciente.edad" name="edad">
+          <input type="number" placeholder="NIT" [(ngModel)]="paciente.nit" name="nit">
+          <input type="number" placeholder="CUI" [(ngModel)]="paciente.cui" name="cui">
+          <input type="text" placeholder="Dirección" [(ngModel)]="paciente.direccion" name="direccion">
+          <input type="number" placeholder="Teléfono" [(ngModel)]="paciente.telefono" name="telefono">
+          <button type="submit">Guardar</button>
+          <button type="button" (click)="limpiarPaciente(); limpiarPantalla()">Cancelar</button>
+        </form>
+
+        <!-- ✅ Mensajes dentro del mismo bloque -->
+        <p *ngIf="mensaje" class="mensaje-exito">{{ mensaje }}</p>
+        <p *ngIf="error" class="mensaje-error">{{ error }}</p>
+      </div>
+
+
+      <div *ngSwitchCase="'ingresarCita'">
+        <h2>📅 Nueva Cita</h2>
+        <form (ngSubmit)="crearCita()">
+          <input type="text" placeholder="Nombre Paciente" [(ngModel)]="cita.nombrecompleto_paciente"
+            name="nombrecompleto_paciente" required>
+          <input type="number" placeholder="NIT" [(ngModel)]="cita.nit" name="nit" required>
+          <input type="text" placeholder="Nombre Doctor" [(ngModel)]="cita.nombrecompleto_doctor"
+            name="nombrecompleto_doctor" required>
+          <input type="text" placeholder="Colegiado" [(ngModel)]="cita.colegiado" name="colegiado" required>
+          <input type="text" placeholder="Motivo" [(ngModel)]="cita.motivoconsulta" name="motivoconsulta" required>
+          <input type="datetime-local" [(ngModel)]="cita.fechacita" name="fechacita" required>
+          <input type="email" placeholder="Correo" [(ngModel)]="cita.correo" name="correo">
+          <button type="submit">Crear Cita</button>
+          <button type="button" (click)="limpiarCita(); limpiarPantalla()">Cancelar</button>
+        </form>
+      </div>
+
+
+      <div *ngSwitchCase="'verPacientes'">
+        <h2>👥 Lista de Pacientes</h2>
+        <div class="filtros-busqueda">
+          <input type="text" [(ngModel)]="busquedaPaciente" placeholder="Buscar por nombre">
+          <input type="number" [(ngModel)]="busquedaNit" placeholder="Buscar por NIT">
+          <input type="number" [(ngModel)]="busquedaCui" placeholder="Buscar por CUI">
+          <input type="date" [(ngModel)]="busquedaPacienteFecha" placeholder="Buscar por fecha">
+          <div style="margin-bottom: 15px;">
+            <button (click)="filtrarPacientes()">Filtrar</button>
+            <button (click)="consultarPacientes()">Recargar</button>
+            <button (click)="limpiarCamposBusquedaPacientes()">Limpiar</button>
+          </div>
+
+        </div>
+        <table class="tabla-citas" *ngIf="pacientes.length > 0">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Edad</th>
+              <th>NIT</th>
+              <th>CUI</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of pacientes">
+              <td>{{ p.nombrecompleto }}</td>
+              <td>{{ p.edad }}</td>
+              <td>{{ p.nit }}</td>
+              <td>{{ p.cui }}</td>
+              <td>{{ p.direccion }}</td>
+              <td>{{ p.telefono }}</td>
+              <td>{{ p.fecha | date:'dd/MM/yyyy' }}</td>
+              <td>{{ p.estado }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+
+      <div *ngSwitchCase="'verDoctores'">
+        <h2>🩺 Lista de Doctores</h2>
+        <div class="filtros-busqueda">
+          <input type="text" [(ngModel)]="busquedaDoctorNombre" placeholder="Buscar por nombre">
+          <input type="text" [(ngModel)]="busquedaDoctorColegiado" placeholder="Buscar por colegiado">
+          <input type="text" [(ngModel)]="busquedaDoctorEspecialidad" placeholder="Buscar por especialidad">
+          <input type="date" [(ngModel)]="busquedaDoctorFecha" placeholder="Buscar por fecha">
+          <div style="margin-bottom: 15px;">
+            <button (click)="filtrarDoctores()">Filtrar</button>
+            <button (click)="verDoctores()">Recargar</button>
+            <button (click)="limpiarCamposBusquedaDoctores()">Limpiar</button>
+          </div>
+
+        </div>
+        <table class="tabla-citas" *ngIf="doctores.length > 0">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Colegiado</th>
+              <th>Especialidad</th>
+              <th>Fecha</th>
+              <th>Dirección</th>
+              <th>Centro</th>
+              <th>Edad</th>
+              <th>Obs</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of doctores">
+              <td>{{ d.nombrecompleto }}</td>
+              <td>{{ d.colegiado }}</td>
+              <td>{{ d.especialidad }}</td>
+              <td>{{ d.fecharegistro | date:'dd/MM/yyyy' }}</td>
+              <td>{{ d.direccion }}</td>
+              <td>{{ d.centrohospitalario }}</td>
+              <td>{{ d.edad }}</td>
+              <td>{{ d.observacion }}</td>
+              <td>{{ d.estado }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+
+      <div *ngSwitchCase="'programadas'">
+        <h2>📌 Citas Programadas</h2>
+        <button class="btn-recargar" (click)="consultarCitasPorEstado('programadas')">🔄 Recargar</button>
+
+        <table class="tabla-citas" *ngIf="citas.length > 0">
+          <thead>
+            <tr>
+              <th>ID CITA</th>
+              <th>Paciente</th>
+              <th>NIT</th>
+              <th>Doctor</th>
+              <th>Colegiado</th>
+              <th>Correo</th>
+              <th>Fecha</th>
+              <th>Motivo</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of citas">
+              <td>{{ c.idcita }}</td>
+              <td>{{ c.nombrecompletoPaciente }}</td>
+              <td>{{ c.nit }}</td>
+              <td>{{ c.nombrecompletoDoctor }}</td>
+              <td>{{ c.colegiado }}</td>
+              <td>{{ c.correo }}</td>
+              <td>{{ c.fechacita | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ c.motivoconsulta }}</td>
+              <td>
+                <span [ngClass]="{
+            'estado-programada': c.estado === 'PROGRAMADA',
+            'estado-realizada': c.estado === 'REALIZADA',
+            'estado-cancelada': c.estado === 'CANCELADA'
+          }">{{ c.estado }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p *ngIf="citas.length === 0">No hay citas programadas actualmente.</p>
+      </div>
+
+
+
+      <div *ngSwitchCase="'realizadas'">
+        <h2>✅ Citas Realizadas</h2>
+        <button class="btn-recargar" (click)="consultarCitasPorEstado('realizadas')">🔄 Recargar</button>
+
+        <table class="tabla-citas" *ngIf="citas.length > 0">
+          <thead>
+            <tr>
+              <th>ID CITA</th>
+              <th>Paciente</th>
+              <th>NIT</th>
+              <th>Doctor</th>
+              <th>Colegiado</th>
+              <th>Correo</th>
+              <th>Fecha</th>
+              <th>Motivo</th>
+              <th>Costo</th>
+              <th>Finalización</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of citas">
+              <td>{{ c.idcita }}</td>
+              <td>{{ c.nombrecompletoPaciente }}</td>
+              <td>{{ c.nit }}</td>
+              <td>{{ c.nombrecompletoDoctor }}</td>
+              <td>{{ c.colegiado }}</td>
+              <td>{{ c.correo }}</td>
+              <td>{{ c.fechacita | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ c.motivoconsulta }}</td>
+              <td>{{ c.costo || '---' }}</td>
+              <td>{{ c.fechaFin ? (c.fechaFin | date:'dd/MM/yyyy HH:mm') : '---' }}</td>
+              <td>
+                <span class="estado-realizada">{{ c.estado }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p *ngIf="citas.length === 0">No hay citas realizadas actualmente.</p>
+      </div>
+
+
+
+      <div *ngSwitchCase="'canceladas'">
+        <h2>❌ Citas Canceladas</h2>
+        <button class="btn-recargar" (click)="consultarCitasPorEstado('canceladas')">🔄 Recargar</button>
+
+        <table class="tabla-citas" *ngIf="citas.length > 0">
+          <thead>
+            <tr>
+              <th>ID CITA</th>
+              <th>Paciente</th>
+              <th>NIT</th>
+              <th>Doctor</th>
+              <th>Colegiado</th>
+              <th>Correo</th>
+              <th>Fecha</th>
+              <th>Motivo</th>
+              <th>Motivo Cancelación</th>
+              <th>Finalización</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of citas">
+              <td>{{ c.idcita }}</td>
+              <td>{{ c.nombrecompletoPaciente }}</td>
+              <td>{{ c.nit }}</td>
+              <td>{{ c.nombrecompletoDoctor }}</td>
+              <td>{{ c.colegiado }}</td>
+              <td>{{ c.correo }}</td>
+              <td>{{ c.fechacita | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ c.motivoconsulta }}</td>
+              <td>{{ c.motivocancelacion || '---' }}</td>
+              <td>{{ c.fechaFin ? (c.fechaFin | date:'dd/MM/yyyy HH:mm') : '---' }}</td>
+              <td>
+                <span class="estado-cancelada">{{ c.estado }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p *ngIf="citas.length === 0">No hay citas canceladas actualmente.</p>
+      </div>
+
+
+
+      <div *ngSwitchCase="'cambiarRealizada'">
+        <h2>✔️ Cambiar a Cita Realizada</h2>
+        <form (ngSubmit)="confirmarRealizada()">
+          <label for="idRealizada"><strong>ID de la Cita</strong></label>
+          <input type="number" [(ngModel)]="formRealizada.id" name="idRealizada" placeholder="ID Cita">
+          <label for="costo"><strong>Costo de la Cita</strong></label>
+          <input type="number" [(ngModel)]="formRealizada.costo" name="costo" placeholder="Costo">
+          <label for="fechaFin"><strong>Fecha y Hora de Finalización</strong></label>
+          <input type="datetime-local" [(ngModel)]="formRealizada.fechaFin" name="fechaFin" placeholder="Fecha Fin">
+          <button type="submit">Confirmar</button>
+          <button type="button" (click)="limpiarFormRealizada()">🧼 Limpiar</button>
+        </form>
+      </div>
+
+
+      <div *ngSwitchCase="'cambiarCancelada'">
+        <h2>❌ Cambiar a Cita Cancelada</h2>
+        <form (ngSubmit)="confirmarCancelada()">
+          <label for="idCancelada"><strong>ID de la Cita</strong></label>
+          <input type="number" [(ngModel)]="formCancelada.id" name="idCancelada" placeholder="ID Cita">
+          <label for="fechaFinCancelada"><strong>Fecha y Hora de Cancelación</strong></label>
+          <input type="datetime-local" [(ngModel)]="formCancelada.fechaFin" name="fechaFinCancelada"
+            placeholder="Fecha Fin">
+          <label for="motivoCancelacion"><strong>Motivo de Cancelación</strong></label>
+          <input type="text" [(ngModel)]="formCancelada.motivocancelacion" name="motivoCancelacion"
+            placeholder="Motivo">
+          <button type="submit">Confirmar</button>
+          <button type="button" (click)="limpiarFormCancelada()">🧼 Limpiar</button>
+        </form>
+      </div>
+
+
+      <div *ngSwitchCase="'filtroCitas'">
+        <h2>🔎 Consultar Citas por Paciente y Estado</h2>
+
+        <form class="filtro-estado-form" (ngSubmit)="buscarCitasPorEstadosSeleccionados()">
+          <input type="number" [(ngModel)]="busquedaNit" name="nit" placeholder="NIT del Paciente">
+
+
+          <label>
+            <span>PROGRAMADA</span>
+            <input type="checkbox" [(ngModel)]="estadoProgramada" name="programada">
+          </label>
+
+          <label>
+            <span>REALIZADA</span>
+            <input type="checkbox" [(ngModel)]="estadoRealizada" name="realizada">
+          </label>
+
+          <label>
+            <span>CANCELADA</span>
+            <input type="checkbox" [(ngModel)]="estadoCancelada" name="cancelada">
+          </label>
+
+          <div>
+            <button type="submit">🔍 Buscar</button>
+            <button type="button" (click)="limpiarCamposFiltroCitas()">🧼 Limpiar Campos</button>
+          </div>
+        </form>
+
+        <table *ngIf="resultadoCitas.length > 0" class="tabla-citas">
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>NIT</th>
+              <th>Doctor</th>
+              <th>Colegiado</th>
+              <th>Correo</th>
+              <th>Fecha</th>
+              <th>Motivo</th>
+              <th>Motivo Cancelación</th>
+              <th>Finalización</th>
+              <th>Estado</th>
+              <th>Costo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of resultadoCitas">
+              <td>{{ c.nombrecompletoPaciente }}</td>
+              <td>{{ c.nit }}</td>
+              <td>{{ c.nombrecompletoDoctor }}</td>
+              <td>{{ c.colegiado }}</td>
+              <td>{{ c.correo }}</td>
+              <td>{{ c.fechacita | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ c.motivoconsulta }}</td>
+              <td>{{ c.motivocancelacion || '---' }}</td>
+              <td>{{ c.fechaFin ? (c.fechaFin | date:'dd/MM/yyyy HH:mm') : '---' }}</td>
+              <td>
+                <span [ngClass]="{
+            'estado-programada': c.estado === 'PROGRAMADA',
+            'estado-realizada': c.estado === 'REALIZADA',
+            'estado-cancelada': c.estado === 'CANCELADA'
+          }">{{ c.estado }}</span>
+              </td>
+              <td>{{ c.costo || '---' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+
+
+
+      <div *ngSwitchDefault>
+        <!-- Bienvenida o sección vacía -->
+        <p>Selecciona una opción del panel lateral para comenzar.</p>
+      </div>
+    </ng-container>
+  </div>
+</div>

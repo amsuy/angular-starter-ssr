@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.contenedor {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+}
+
+/* ENCABEZADO */
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #81d4fa, #4fc3f7);
+  padding: 40px;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.logo {
+  height: 90px;
+  width: auto;
+  max-width: 200px;
+  transform: scaleX(1.3); /* estirado horizontal */
+}
+
+.bienvenida-box {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 30px 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  z-index: 2;
+}
+
+.titulo {
+  font-family: 'Merriweather', serif;
+  font-size: 2.5em;
+  color: #0d47a1;
+  margin-bottom: 10px;
+}
+
+.descripcion {
+  font-size: 1.2em;
+  color: #00334e;
+  margin: 0;
+  font-weight: 500;
+}
+
+.boton-login {
+  background-color: #0277bd;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease;
+}
+
+.boton-login:hover {
+  background-color: #01579b;
+}
+
+/* CONTENIDO */
+.contenido {
+  text-align: center;
+  padding: 160px 20px 50px;
+  background-image: url('/assets/img/hospital-fondo.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  flex-grow: 1;
+}
+
+.cards {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-top: 50px;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  padding: 20px;
+  width: 320px;
+  text-align: center;
+  transition: transform 0.3s;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+.card:hover {
+  transform: scale(1.03);
+}
+
+.img-card {
+  width: 100%;
+  height: 340px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.subtitulo {
+  font-size: 1.6em;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.vision {
+  color: green;
+}
+
+.mision {
+  color: crimson;
+}
+
+.valores {
+  color: orange;
+}
+
+.texto {
+  font-size: 1em;
+  color: #424242;
+  line-height: 1.6;
+}
+
+/* ANIMACIÓN */
+@keyframes fadeInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* PIE DE PÁGINA */
+.pie {
+  background-color: #263238;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  font-size: 0.9em;
+}

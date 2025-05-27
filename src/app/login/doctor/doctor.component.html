@@ -1,0 +1,171 @@
+<div class="doctor-dashboard">
+  <!-- Sidebar Fija -->
+  <div class="sidebar">
+
+    <img src="assets/img/logo.png" alt="Hospital Logo" class="logo" />
+    <div class="user-info">👨‍⚕️ {{ username }}</div>
+
+    <button (click)="mostrarSeccion('estado')">📌 Citas por Estado</button>
+    <button (click)="mostrarSeccion('nitEstado')">🔎 Por NIT y Estado</button>
+    <button (click)="mostrarSeccion('rangoFechas')">📆 Rango de Fechas</button>
+    <button (click)="mostrarSeccion('hoyColegiado')">📟 Hoy por Colegiado</button>
+    <button (click)="mostrarSeccion('historialColegiado')">📉 Historial por Colegiado</button>
+    <button (click)="mostrarSeccion('finalizarCita')">✅ Cambiar Cita a Realizada</button>
+    <button (click)="mostrarSeccion('buscarPacienteNit')">🧍 Buscar Paciente por NIT</button>
+    <!-- Botones adicionales con el mismo estilo -->
+    <button (click)="limpiarPantalla()">🧹 Refrescar Pantalla</button>
+    <button (click)="cerrarSesion()">⬅ Cerrar Sesión</button>
+
+
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="main-content">
+    <div class="panel-header">🩺 Panel del Doctor</div>
+
+    <!-- Secciones dinámicas -->
+    <div *ngIf="seccionActiva === 'estado'">
+      <h2>📌 Citas por Estado</h2>
+      <select [(ngModel)]="estado">
+        <option value="" disabled selected>Selecciona el estado</option>
+        <option value="PROGRAMADA">📌 PROGRAMADA</option>
+        <option value="REALIZADA">✅ REALIZADA</option>
+        <option value="CANCELADA">❌ CANCELADA</option>
+      </select>
+      <button (click)="consultarCitasPorEstado()">Buscar</button>
+      <button class="btn-limpiar" (click)="limpiarCamposEstado()">🧽 Limpiar</button>
+    </div>
+
+    <div *ngIf="seccionActiva === 'nitEstado'">
+      <h2>🔎 Consultar por NIT y Estado</h2>
+      <input type="number" [(ngModel)]="nitPaciente" placeholder="NIT del Paciente" />
+      <select [(ngModel)]="estado">
+        <option value="" disabled selected>Selecciona el estado</option>
+        <option value="PROGRAMADA">📌 PROGRAMADA</option>
+        <option value="REALIZADA">✅ REALIZADA</option>
+        <option value="CANCELADA">❌ CANCELADA</option>
+      </select>
+      <button (click)="consultarCitasPorNitYEstado()">Buscar</button>
+      <button class="btn-limpiar" (click)="limpiarCamposNitYEstado()">🧽 Limpiar</button>
+    </div>
+
+    <div *ngIf="seccionActiva === 'rangoFechas'">
+      <h2>📆 Consultar por Citas por Rango de Fechas</h2>
+      <input type="datetime-local" [(ngModel)]="fechaInicio" placeholder="Fecha Inicio" />
+      <input type="datetime-local" [(ngModel)]="fechaFin" placeholder="Fecha Fin" />
+      <button (click)="consultarCitasPorRangoFechas()">Buscar</button>
+      <button class="btn-limpiar" (click)="limpiarCamposRangoFechas()">🧽 Limpiar</button>
+    </div>
+
+    <div *ngIf="seccionActiva === 'hoyColegiado'">
+      <h2>🧾 Citas de Hoy por Colegiado</h2>
+      <input [(ngModel)]="colegiado" placeholder="Colegiado" />
+      <button (click)="consultarCitasDeHoyPorColegiado()">Buscar</button>
+      <button class="btn-limpiar" (click)="limpiarCamposHoyColegiado()">🧽 Limpiar</button>
+    </div>
+
+    <div *ngIf="seccionActiva === 'historialColegiado'">
+      <h2>📉 Historial por Colegiado</h2>
+      <input [(ngModel)]="colegiado" placeholder="Colegiado" />
+      <input type="date" [(ngModel)]="fechaInicio" placeholder="Fecha Inicio" />
+      <input type="date" [(ngModel)]="fechaFin" placeholder="Fecha Fin" />
+      <button (click)="consultarHistorialPorColegiado()">Buscar</button>
+      <button class="btn-limpiar" (click)="limpiarCamposHistorialColegiado()">🧽 Limpiar</button>
+    </div>
+
+    <div *ngIf="seccionActiva === 'finalizarCita'">
+      <h2>✅ Finalizar Cita</h2>
+
+      <label for="idCita">🆔 ID de la Cita:</label>
+      <input id="idCita" [(ngModel)]="idCitaFinalizar" type="number" placeholder="Ej. 25" />
+
+      <label for="costoCita">💰 Costo de la Cita (Q):</label>
+      <input id="costoCita" [(ngModel)]="costoCita" type="number" placeholder="Ej. 100" />
+
+      <label for="fechaFinCita">🗓️ Fecha de Finalización:</label>
+      <input id="fechaFinCita" [(ngModel)]="fechaFinCita" type="datetime-local" />
+
+      <div class="botonera-modal-finalizar">
+        <button class="btn-finalizar" (click)="finalizarCita()">Finalizar</button>
+        <button class="btn-limpiar" (click)="limpiarCamposFinalizarCita()">🧽 Limpiar</button>
+      </div>
+    </div>
+
+
+    <div *ngIf="seccionActiva === 'buscarPacienteNit'">
+      <h2>🧍 Buscar Paciente por NIT</h2>
+      <input type="number" [(ngModel)]="nitPaciente" placeholder="Ingrese NIT del paciente" />
+      <button (click)="buscarPacientesPorNit()">Buscar</button>
+      <button class="btn-limpiar" (click)="limpiarCamposPacientePorNit()">🧽 Limpiar</button>
+
+      <div *ngIf="pacientes.length > 0" class="tabla-scroll">
+        <table class="tabla-citas">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Edad</th>
+              <th>NIT</th>
+              <th>CUI</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of pacientes">
+              <td>{{ p.nombrecompleto }}</td>
+              <td>{{ p.edad }}</td>
+              <td>{{ p.nit }}</td>
+              <td>{{ p.cui }}</td>
+              <td>{{ p.direccion }}</td>
+              <td>{{ p.telefono }}</td>
+              <td>{{ p.fecha | date:'dd/MM/yyyy' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="citas.length > 0" class="resultados">
+      <h2>📋 Resultados de Citas</h2>
+      <table class="tabla-citas">
+        <thead>
+          <tr>
+            <th>Id Cita</th>
+            <th>Paciente</th>
+            <th>NIT</th>
+            <th>Doctor</th>
+            <th>Colegiado</th>
+            <th>Fecha</th>
+            <th>Motivo</th>
+            <th>Estado</th>
+            <th>Costo</th>
+            <th>Fin</th>
+            <th>Motivo Cancelacion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of citas">
+            <td>{{ c.idcita }}</td>
+            <td>{{ c.nombrecompletoPaciente }}</td>
+            <td>{{ c.nit }}</td>
+            <td>{{ c.nombrecompletoDoctor }}</td>
+            <td>{{ c.colegiado }}</td>
+            <td>{{ c.fechacita | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ c.motivoconsulta }}</td>
+            <td>
+              <span [ngClass]="{
+                'estado-programada': c.estado === 'PROGRAMADA',
+                'estado-realizada': c.estado === 'REALIZADA',
+                'estado-cancelada': c.estado === 'CANCELADA'
+              }">{{ c.estado }}</span>
+            </td>
+            <td>{{ c.costo || '---' }}</td>
+            <td>{{ c.fechaFin ? (c.fechaFin | date:'dd/MM/yyyy HH:mm') : '---' }}</td>
+            <td>{{ c.motivocancelacion || '---'}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

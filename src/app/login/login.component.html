@@ -1,0 +1,9 @@
+<div class="login-page">
+  <div class="login-container">
+    <h2>Iniciar sesión</h2>
+    <input type="text" [(ngModel)]="username" placeholder="Usuario" class="login-input" />
+    <input type="password" [(ngModel)]="password" placeholder="Contraseña" class="login-input" />
+    <button (click)="login()" [disabled]="!username || !password" class="login-button">Ingresar</button>
+    <p *ngIf="error" class="error-message">{{ error }}</p>
+  </div>
+</div>
