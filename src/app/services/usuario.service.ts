@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
-  private rolesUrl = 'http://localhost:9494/api';
+  private rolesUrl = 'https://optimistic-appreciation-production-b7e1.up.railway.app/api';
 
   constructor(private http: HttpClient) {}
 
@@ -69,13 +69,13 @@ consultarCitasPorEstado(estado: string): Observable<any> {
 // ✅ Cambiar estado a REALIZADA
 marcarComoRealizada(id: number, datos: any): Observable<any> {
   const headers = { 'Content-Type': 'application/json' };
-  return this.http.put(`http://localhost:9292/api/citas/finalizar/${id}`, datos, { headers });
+  return this.http.put(`https://micro-citas-production.up.railway.app/api/citas/finalizar/${id}`, datos, { headers });
 }
 
 // ✅ Cambiar estado a CANCELADA (ahora también recibe fechaFin)
 marcarComoCancelada(id: number, datos: any): Observable<any> {
   const headers = { 'Content-Type': 'application/json' };
-  return this.http.put(`http://localhost:9292/api/citas/cancelar/${id}`, datos, { headers });
+  return this.http.put(`https://micro-citas-production.up.railway.app/api/citas/cancelar/${id}`, datos, { headers });
 }
 
 
